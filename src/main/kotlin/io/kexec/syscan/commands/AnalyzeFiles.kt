@@ -1,29 +1,42 @@
 package io.kexec.syscan.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
+import io.kexec.syscan.artifact.AnalysisSteps
 import io.kexec.syscan.artifact.Artifact
-import io.kexec.syscan.artifact.ExecutableFileArtifact
-import io.kexec.syscan.common.AttributedData
+import io.kexec.syscan.artifact.FileArtifact
+import io.kexec.syscan.common.MetadataStore
+import io.kexec.syscan.concurrent.ConcurrentPool
 import io.kexec.syscan.io.fsPath
 import io.kexec.syscan.io.*
-import io.kexec.syscan.pipeline.Pipeline
+import io.kexec.syscan.pipeline.MetadataSourcePlanner
 import kotlinx.serialization.json.Json
 
-class ArtifactDiscoveryCommand : CliktCommand("Artifact Discovery", name = "discover-artifacts") {
+class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") {
   private val rootFsPath by option("--root", "-r").fsPath(mustExist = true, canBeFile = false).required()
 
+  private val pool by requireObject<ConcurrentPool>()
+
   override fun run() {
-    val pipeline = Pipeline(Artifact::class)
-    pipeline.addHandler { artifact ->
-      val description = artifact.describe()
-      val content = Json.encodeToString(AttributedData.serializer(), description)
-      println(content)
+    val planner = MetadataSourcePlanner(AnalysisSteps.all)
+    val steps = planner.plan()
+
+    val encodeMetadata = { store: MetadataStore ->
+      Json.encodeToString(MetadataStore.serializer(), store)
     }
 
-    val visitor = ArtifactPathVisitor(pipeline::pipe)
+    val visitor = ArtifactPathVisitor { artifact ->
+      pool.submit {
+        for (step in steps) {
+          step.analyze(artifact)
+        }
+        println(encodeMetadata(artifact.metadata))
+      }
+    }
     rootFsPath.visit(visitor)
+    pool.waitAndStop()
   }
 
   private class ArtifactPathVisitor(val block: (Artifact) -> Unit) : FsPathVisitor {
@@ -33,7 +46,7 @@ class ArtifactDiscoveryCommand : CliktCommand("Artifact Discovery", name = "disc
 
     override fun visitFile(path: FsPath): FsPathVisitor.VisitResult {
       if (path.isExecutable() && path.isRegularFile()) {
-        block(ExecutableFileArtifact(path))
+        block(FileArtifact(path))
       }
       return FsPathVisitor.VisitResult.Continue
     }

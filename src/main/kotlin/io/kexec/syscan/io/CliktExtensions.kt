@@ -8,7 +8,6 @@ import com.github.ajalt.clikt.parameters.arguments.convert
 import com.github.ajalt.clikt.parameters.options.NullableOption
 import com.github.ajalt.clikt.parameters.options.RawOption
 import com.github.ajalt.clikt.parameters.options.convert
-import io.kexec.syscan.io.*
 import io.kexec.syscan.io.java.JavaPath
 import kotlinx.serialization.DeserializationStrategy
 import java.nio.file.Path
@@ -52,14 +51,16 @@ fun RawArgument.fsPath(
   canBeSymlink: Boolean = true
 ): ProcessedArgument<FsPath, FsPath> {
   return convert(completionCandidates = CompletionCandidates.Path) { str ->
-    convertToPath(str,
+    convertToPath(
+      str,
       mustExist,
       canBeFile,
       canBeDir,
       mustBeWritable,
       mustBeReadable,
       canBeSymlink,
-      context) { fail(it) }
+      context
+    ) { fail(it) }
   }
 }
 
@@ -72,19 +73,21 @@ fun RawOption.fsPath(
   canBeSymlink: Boolean = true
 ): NullableOption<FsPath, FsPath> {
   return convert({ localization.pathMetavar() }, CompletionCandidates.Path) { str ->
-    convertToPath(str,
+    convertToPath(
+      str,
       mustExist,
       canBeFile,
       canBeDir,
       mustBeWritable,
       mustBeReadable,
       canBeSymlink,
-      context) { fail(it) }
+      context
+    ) { fail(it) }
   }
 }
 
 
-fun <T: Any> RawArgument.fsJsonFile(deserializer: DeserializationStrategy<T>): ProcessedArgument<T, T> {
+fun <T : Any> RawArgument.fsJsonFile(deserializer: DeserializationStrategy<T>): ProcessedArgument<T, T> {
   return convert(completionCandidates = CompletionCandidates.Path) { str ->
     val fsPath = convertToPath(
       str,
@@ -100,7 +103,7 @@ fun <T: Any> RawArgument.fsJsonFile(deserializer: DeserializationStrategy<T>): P
   }
 }
 
-fun <T: Any> RawOption.fsJsonFile(deserializer: DeserializationStrategy<T>): NullableOption<T, T> {
+fun <T : Any> RawOption.fsJsonFile(deserializer: DeserializationStrategy<T>): NullableOption<T, T> {
   return convert(completionCandidates = CompletionCandidates.Path) { str ->
     val fsPath = convertToPath(
       str,

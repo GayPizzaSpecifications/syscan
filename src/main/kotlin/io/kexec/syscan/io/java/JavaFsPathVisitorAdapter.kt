@@ -24,7 +24,7 @@ class JavaFsPathVisitorAdapter(private val visitor: FsPathVisitor) : FileVisitor
     return visitor.afterVisitDirectory(dir!!.toFsPath()).adapt()
   }
 
-  private fun FsPathVisitor.VisitResult.adapt(): FileVisitResult = when(this) {
+  private fun FsPathVisitor.VisitResult.adapt(): FileVisitResult = when (this) {
     FsPathVisitor.VisitResult.Continue -> FileVisitResult.CONTINUE
     FsPathVisitor.VisitResult.Terminate -> FileVisitResult.TERMINATE
     FsPathVisitor.VisitResult.SkipSubtree -> FileVisitResult.SKIP_SUBTREE

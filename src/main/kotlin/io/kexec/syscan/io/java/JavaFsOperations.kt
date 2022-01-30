@@ -7,6 +7,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
+import kotlin.io.path.inputStream
 import kotlin.streams.asSequence
 
 object JavaFsOperations : FsOperations {
@@ -26,6 +27,16 @@ object JavaFsOperations : FsOperations {
 
   override fun readString(path: FsPath): String = Files.readString(path.toJavaPath())
   override fun readAllBytes(path: FsPath): ByteArray = Files.readAllBytes(path.toJavaPath())
+  override fun readBytesChunked(path: FsPath, block: (ByteArray, Int) -> Unit) {
+    val javaPath = path.toJavaPath()
+    val stream = javaPath.inputStream()
+    val buffer = ByteArray(1024 * 1024)
+    var count: Int
+    while ((stream.read(buffer).also { count = it }) > 0) {
+      block(buffer, count)
+    }
+  }
+
   override fun <T> readJsonFile(path: FsPath, deserializer: DeserializationStrategy<T>): T =
     Json.decodeFromString(deserializer, readString(path))
 

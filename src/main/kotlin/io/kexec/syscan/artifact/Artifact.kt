@@ -1,6 +1,9 @@
 package io.kexec.syscan.artifact
 
-import io.kexec.syscan.common.Attributor
-import io.kexec.syscan.common.Describable
+import io.kexec.syscan.common.HasMetadata
+import io.kexec.syscan.common.MetadataStore
 
-interface Artifact: Attributor, Describable
+open class Artifact : HasMetadata {
+  override val metadata: MetadataStore = MetadataStore()
+}
+

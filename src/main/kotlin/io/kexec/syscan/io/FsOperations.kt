@@ -19,6 +19,7 @@ interface FsOperations {
 
   fun readString(path: FsPath): String
   fun readAllBytes(path: FsPath): ByteArray
+  fun readBytesChunked(path: FsPath, block: (ByteArray, Int) -> Unit)
   fun <T> readJsonFile(path: FsPath, deserializer: DeserializationStrategy<T>): T
 
   fun writeString(path: FsPath, content: String)
