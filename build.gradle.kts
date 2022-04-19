@@ -1,8 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+  application
+
   kotlin("jvm") version "1.6.20"
   kotlin("plugin.serialization") version "1.6.20"
+
+  id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 repositories {
@@ -28,6 +32,10 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Wrapper> {
-  gradleVersion = "7.4"
+  gradleVersion = "7.4.2"
   distributionType = Wrapper.DistributionType.ALL
+}
+
+application {
+  mainClass.set("io.kexec.syscan.MainKt")
 }
