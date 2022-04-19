@@ -4,7 +4,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -22,5 +23,5 @@ jobs:
       - name: Publish Shadow JAR
         uses: actions/upload-artifact@v2
         with:
-          name: ksyscan.jar
-          path: build/distributions/ksyscan-shadow.jar
+          name: ksyscan-all.jar
+          path: build/libs/ksyscan-all.jar
