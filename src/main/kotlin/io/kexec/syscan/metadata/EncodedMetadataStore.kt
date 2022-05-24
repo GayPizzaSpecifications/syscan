@@ -1,6 +1,7 @@
 package io.kexec.syscan.metadata
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
@@ -13,4 +14,6 @@ data class EncodedMetadataStore(
     val source: String,
     val value: JsonElement
   )
+
+  fun encodeToJson(): String = Json.encodeToString(serializer(), this)
 }

@@ -1,11 +1,15 @@
 package io.kexec.syscan.metadata
 
 import io.kexec.syscan.io.FsPath
+import java.time.Instant
 
-object MetadataKeys {
-  val FilePath = MetadataKey<FsPath>("filesystem", "path")
+object CommonMetadataKeys {
+  val ReadableFilePath = MetadataKey<FsPath>("filesystem", "readable-path", encodable = false)
+  val VirtualFilePath = MetadataKey<FsPath>("filesystem", "path")
+
   val ExecutableFileMarker = MetadataKey<Boolean>("filesystem", "executable")
   val MimeType = MetadataKey<String>("filesystem", "mime-type")
+  val LastModified = MetadataKey<Instant>("filesystem", "last-modified")
 
   val HashMd5 = MetadataKey<String>("hash", "md5")
   val HashSha1 = MetadataKey<String>("hash", "sha1")

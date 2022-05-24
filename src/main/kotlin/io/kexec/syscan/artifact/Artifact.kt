@@ -5,4 +5,6 @@ import io.kexec.syscan.metadata.MetadataStore
 
 open class Artifact(id: String) : HasMetadata {
   override val metadata: MetadataStore = MetadataStore(id)
+
+  open fun cleanup() {}
 }

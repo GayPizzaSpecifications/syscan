@@ -4,6 +4,6 @@ interface MetadataSource {
   val metadataSourceKey: String
     get() = this::class.simpleName!!
 
-  val wants: List<MetadataKey<*>>
-  val provides: List<MetadataKey<*>>
+  val wants: MetadataWants
+  val provides: MetadataKeys
 }

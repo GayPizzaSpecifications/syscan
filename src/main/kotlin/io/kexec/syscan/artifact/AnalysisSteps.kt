@@ -4,10 +4,11 @@ import io.kexec.syscan.steps.*
 
 object AnalysisSteps {
   val all = listOf(
-    FsinfoStep,
+    FileInfoStep,
     FileHashStep,
     UniversalBinaryStep,
     DynamicLinkerStep,
-    MagicFileStep
+    MagicFileStep,
+    IpswAnalysisStep
   )
 }

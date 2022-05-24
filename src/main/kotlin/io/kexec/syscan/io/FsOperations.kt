@@ -2,6 +2,7 @@ package io.kexec.syscan.io
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import java.time.Instant
 
 interface FsOperations {
   fun exists(path: FsPath): Boolean
@@ -31,4 +32,8 @@ interface FsOperations {
   fun <T> writeJsonFile(path: FsPath, serializer: SerializationStrategy<T>, value: T)
 
   fun delete(path: FsPath)
+  fun deleteOnExit(path: FsPath)
+  fun deleteRecursively(path: FsPath)
+
+  fun lastModifiedTime(path: FsPath): Instant
 }

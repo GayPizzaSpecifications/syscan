@@ -11,6 +11,9 @@ class JavaTaskPool(concurrency: Int) : TaskPool {
   }
 
   override fun waitAndStop() {
+    while (pool.activeCount != 0) {
+      Thread.yield()
+    }
     pool.shutdown()
   }
 }

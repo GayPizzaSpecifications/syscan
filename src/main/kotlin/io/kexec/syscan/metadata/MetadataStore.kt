@@ -11,6 +11,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import java.time.Instant
 
 @Serializable(with = MetadataStoreSerializer::class)
 class MetadataStore(val id: String) {
@@ -28,6 +29,9 @@ class MetadataStore(val id: String) {
 
   fun set(source: MetadataSource, key: MetadataKey<Boolean>, value: Boolean) =
     set(source, key, value) { JsonPrimitive(value) }
+
+  fun set(source: MetadataSource, key: MetadataKey<Instant>, value: Instant) =
+    set(source, key, value) { JsonPrimitive(value.toString()) }
 
   fun set(source: MetadataSource, key: MetadataKey<List<String>>, value: List<String>) =
     set(source, key, ListSerializer(String.serializer()), value)
@@ -55,4 +59,6 @@ class MetadataStore(val id: String) {
   }
 
   fun <T> has(it: MetadataKey<T>) = metadata[it] != null
+
+  fun encodeToJson(): JsonElement = Json.encodeToJsonElement(serializer(), this)
 }

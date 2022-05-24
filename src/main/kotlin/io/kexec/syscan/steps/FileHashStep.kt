@@ -1,23 +1,23 @@
 package io.kexec.syscan.steps
 
 import io.kexec.syscan.PlatformHash
+import io.kexec.syscan.artifact.AnalysisContext
 import io.kexec.syscan.artifact.AnalysisStep
 import io.kexec.syscan.artifact.Artifact
-import io.kexec.syscan.metadata.MetadataKey
-import io.kexec.syscan.metadata.MetadataKeys
 import io.kexec.syscan.io.readBytesChunked
+import io.kexec.syscan.metadata.*
 
 object FileHashStep : AnalysisStep {
-  override val wants: List<MetadataKey<*>> = listOf(MetadataKeys.FilePath)
-  override val provides: List<MetadataKey<*>> = listOf(
-    MetadataKeys.HashMd5,
-    MetadataKeys.HashSha1,
-    MetadataKeys.HashSha256,
-    MetadataKeys.HashSha512
+  override val wants: MetadataWants = listOf(CommonMetadataKeys.ReadableFilePath.want())
+  override val provides: MetadataKeys = listOf(
+    CommonMetadataKeys.HashMd5,
+    CommonMetadataKeys.HashSha1,
+    CommonMetadataKeys.HashSha256,
+    CommonMetadataKeys.HashSha512
   )
 
-  override fun analyze(artifact: Artifact) {
-    val path = artifact.metadata.require(MetadataKeys.FilePath)
+  override fun analyze(context: AnalysisContext, artifact: Artifact) {
+    val path = artifact.metadata.require(CommonMetadataKeys.ReadableFilePath)
     val md5 = PlatformHash("MD5")
     val sha1 = PlatformHash("SHA-1")
     val sha256 = PlatformHash("SHA-256")
@@ -35,9 +35,9 @@ object FileHashStep : AnalysisStep {
     val sha256Digest = sha256.digest()
     val sha512Digest = sha512.digest()
 
-    artifact.metadata.set(this, MetadataKeys.HashMd5, md5Digest.toHexString())
-    artifact.metadata.set(this, MetadataKeys.HashSha1, sha1Digest.toHexString())
-    artifact.metadata.set(this, MetadataKeys.HashSha256, sha256Digest.toHexString())
-    artifact.metadata.set(this, MetadataKeys.HashSha512, sha512Digest.toHexString())
+    artifact.metadata.set(this, CommonMetadataKeys.HashMd5, md5Digest.toHexString())
+    artifact.metadata.set(this, CommonMetadataKeys.HashSha1, sha1Digest.toHexString())
+    artifact.metadata.set(this, CommonMetadataKeys.HashSha256, sha256Digest.toHexString())
+    artifact.metadata.set(this, CommonMetadataKeys.HashSha512, sha512Digest.toHexString())
   }
 }

@@ -20,7 +20,7 @@ class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
     for (source in sources) {
       val requires = source.wants
       for (requirement in requires) {
-        if (whatProvides[requirement] == null) {
+        if (requirement.type ==  MetadataWantType.Required && whatProvides[requirement.key] == null) {
           throw Exception(
             "Source $source requires key $requirement but no provider was found"
           )
@@ -31,7 +31,7 @@ class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
     val extrapolatedKeyDependencies = mutableMapOf<MetadataKey<*>, List<MetadataKey<*>>>()
     for ((key, source) in whatProvides) {
       val requires = source.wants
-      extrapolatedKeyDependencies[key] = requires
+      extrapolatedKeyDependencies[key] = requires.map { it.key }
     }
 
     val stack = mutableListOf<MetadataKey<*>>()
@@ -48,6 +48,13 @@ class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
         sortedSources.add(source)
       }
     }
+
+    for (source in sources) {
+      if (!sortedSources.contains(source)) {
+        sortedSources.add(source)
+      }
+    }
+
     return sortedSources
   }
 

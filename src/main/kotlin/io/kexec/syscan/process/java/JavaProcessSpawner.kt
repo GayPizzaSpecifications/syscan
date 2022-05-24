@@ -1,6 +1,7 @@
 package io.kexec.syscan.process.java
 
 import com.zaxxer.nuprocess.NuAbstractProcessHandler
+import com.zaxxer.nuprocess.NuProcess
 import com.zaxxer.nuprocess.NuProcessBuilder
 import io.kexec.syscan.io.FsPath
 import io.kexec.syscan.io.java.toJavaPath
@@ -19,15 +20,24 @@ object JavaProcessSpawner : ProcessSpawner {
     val handler = BufferedProcessHandler()
     builder.setProcessListener(handler)
     val process = builder.start()
-    process.waitFor(0, TimeUnit.SECONDS)
-    return handler.toProcessResult()
+    val exitCode = process.waitFor(0, TimeUnit.SECONDS)
+    return handler.toProcessResult(exitCode)
   }
 
   class BufferedProcessHandler : NuAbstractProcessHandler() {
     private val stdoutByteStream = ByteArrayOutputStream()
     private val stderrByteStream = ByteArrayOutputStream()
 
-    private var exitCode: Int? = null
+    lateinit var process: NuProcess
+
+    override fun onStart(nuProcess: NuProcess) {
+      process = nuProcess
+    }
+
+    override fun onStdinReady(buffer: ByteBuffer): Boolean {
+      process.closeStdin(true)
+      return false
+    }
 
     override fun onStdout(buffer: ByteBuffer, closed: Boolean) {
       val remaining = buffer.remaining()
@@ -43,12 +53,8 @@ object JavaProcessSpawner : ProcessSpawner {
       stdoutByteStream.writeBytes(bytes)
     }
 
-    override fun onExit(statusCode: Int) {
-      exitCode = statusCode
-    }
-
-    fun toProcessResult(): ProcessResult = ProcessResult(
-      exitCode!!,
+    fun toProcessResult(exitCode: Int): ProcessResult = ProcessResult(
+      exitCode,
       stdoutByteStream.toByteArray(),
       stderrByteStream.toByteArray()
     )

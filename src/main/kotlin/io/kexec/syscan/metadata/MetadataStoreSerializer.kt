@@ -16,6 +16,10 @@ class MetadataStoreSerializer : KSerializer<MetadataStore> {
   override fun serialize(encoder: Encoder, value: MetadataStore) {
     val properties = mutableMapOf<String, EncodedMetadataStore.EncodedMetadataProperty>()
     for ((key, entry) in value.metadata) {
+      if (!key.encodable) {
+        continue
+      }
+
       val property = EncodedMetadataStore.EncodedMetadataProperty(
         entry.source.metadataSourceKey,
         entry.encode()

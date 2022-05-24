@@ -1,17 +1,17 @@
 package io.kexec.syscan.steps
 
 import io.kexec.syscan.PlatformProcessSpawner
+import io.kexec.syscan.artifact.AnalysisContext
 import io.kexec.syscan.artifact.AnalysisStep
 import io.kexec.syscan.artifact.Artifact
-import io.kexec.syscan.metadata.MetadataKey
-import io.kexec.syscan.metadata.MetadataKeys
+import io.kexec.syscan.metadata.*
 
 object MagicFileStep : AnalysisStep {
-  override val wants: List<MetadataKey<*>> = listOf(MetadataKeys.FilePath)
-  override val provides: List<MetadataKey<*>> = listOf(MetadataKeys.MimeType)
+  override val wants: MetadataWants = listOf(CommonMetadataKeys.ReadableFilePath.want())
+  override val provides: MetadataKeys = listOf(CommonMetadataKeys.MimeType)
 
-  override fun analyze(artifact: Artifact) {
-    val path = artifact.metadata.require(MetadataKeys.FilePath)
+  override fun analyze(context: AnalysisContext, artifact: Artifact) {
+    val path = artifact.metadata.require(CommonMetadataKeys.ReadableFilePath)
     val result = PlatformProcessSpawner.execute("file", listOf(
       "--brief",
       "--mime-type",
@@ -23,6 +23,6 @@ object MagicFileStep : AnalysisStep {
     }
 
     val mime = result.stdoutAsString.lines().first().trim()
-    artifact.metadata.set(this, MetadataKeys.MimeType, mime)
+    artifact.metadata.set(this, CommonMetadataKeys.MimeType, mime)
   }
 }

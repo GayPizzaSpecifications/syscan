@@ -2,6 +2,7 @@ package io.kexec.syscan.io
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
+import java.time.Instant
 
 fun FsPath.exists(): Boolean =
   operations.exists(this)
@@ -63,5 +64,14 @@ fun FsPath.writeAllBytes(bytes: ByteArray): Unit =
 fun <T> FsPath.writeJsonFile(serializer: SerializationStrategy<T>, value: T): Unit =
   operations.writeJsonFile(this, serializer, value)
 
-fun FsPath.delete() =
+fun FsPath.delete(): Unit =
   operations.delete(this)
+
+fun FsPath.deleteOnExit(): Unit =
+  operations.delete(this)
+
+fun FsPath.deleteRecursively(): Unit =
+  operations.deleteRecursively(this)
+
+fun FsPath.lastModifiedTime(): Instant =
+  operations.lastModifiedTime(this)

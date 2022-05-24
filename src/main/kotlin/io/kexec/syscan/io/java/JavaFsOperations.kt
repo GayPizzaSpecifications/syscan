@@ -7,8 +7,10 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
+import java.time.Instant
 import kotlin.io.path.bufferedReader
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.inputStream
 import kotlin.streams.asSequence
 
@@ -74,5 +76,17 @@ object JavaFsOperations : FsOperations {
 
   override fun delete(path: FsPath) {
     path.toJavaPath().deleteExisting()
+  }
+
+  override fun deleteOnExit(path: FsPath) {
+    path.toJavaPath().toFile().deleteOnExit()
+  }
+
+  override fun deleteRecursively(path: FsPath) {
+    path.toJavaPath().toFile().deleteRecursively()
+  }
+
+  override fun lastModifiedTime(path: FsPath): Instant {
+    return path.toJavaPath().getLastModifiedTime().toInstant()
   }
 }

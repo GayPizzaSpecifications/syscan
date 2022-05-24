@@ -1,10 +1,9 @@
 package io.kexec.syscan.diff
 
 import io.kexec.syscan.metadata.EncodedMetadataStore
-import kotlinx.serialization.json.Json
 
 class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newReportEntries: List<EncodedMetadataStore>) {
-  fun diff(block: (DiffEvent) -> Unit) {
+  fun diff(emit: (DiffEvent) -> Unit) {
     val oldReportIds = oldReportEntries.map { it.id }
     val newReportIds = newReportEntries.map { it.id }
 
@@ -12,11 +11,11 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
     val addedEntryList = newReportIds.filter { !oldReportIds.contains(it) }
 
     for (removedItemId in removedEntryList) {
-      block(RemovedEntryEvent(removedItemId))
+      emit(RemovedEntryEvent(removedItemId))
     }
 
     for (addedItemId in addedEntryList) {
-      block(AddedEntryEvent(addedItemId))
+      emit(AddedEntryEvent(addedItemId))
     }
 
     val sharedEntryList = newReportIds.toMutableSet()
@@ -33,11 +32,11 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
       val addedPropertyKeys = newPropertyKeys.filter { !oldPropertyKeys.contains(it) }
 
       for (removedPropertyKey in removedPropertyKeys) {
-        block(RemovedPropertyEvent(sharedItemId, removedPropertyKey))
+        emit(RemovedPropertyEvent(sharedItemId, removedPropertyKey))
       }
 
       for (addedPropertyKey in addedPropertyKeys) {
-        block(AddedPropertyEvent(sharedItemId, addedPropertyKey))
+        emit(AddedPropertyEvent(sharedItemId, addedPropertyKey))
       }
 
       val sharedPropertyKeys = newPropertyKeys.toMutableSet()
@@ -48,7 +47,7 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
         val newValue = newItem.properties[sharedPropertyKey]!!.value
 
         if (oldValue != newValue) {
-          block(ChangedPropertyEvent(sharedItemId, sharedPropertyKey))
+          emit(ChangedPropertyEvent(sharedItemId, sharedPropertyKey))
         }
       }
     }
@@ -71,27 +70,32 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
     override fun describe(
       oldReportEntries: List<EncodedMetadataStore>,
       newReportEntries: List<EncodedMetadataStore>
-    ): String = "entry added $id ${Json.encodeToString(EncodedMetadataStore.serializer(), newReportEntries.first { it.id == id })}"
+    ): String = "entry added $id ${newReportEntries.find(id).encodeToJson()}"
   }
 
   class AddedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
     override fun describe(
       oldReportEntries: List<EncodedMetadataStore>,
       newReportEntries: List<EncodedMetadataStore>
-    ): String = "property added $id ${newReportEntries.first { it.id == id }.properties[key]!!.value}"
+    ): String = "property added $id ${newReportEntries.find(id, key)}"
   }
 
   class RemovedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
     override fun describe(
       oldReportEntries: List<EncodedMetadataStore>,
       newReportEntries: List<EncodedMetadataStore>
-    ): String = "property removed $key ${oldReportEntries.first { it.id == id }.properties[key]!!.value}"
+    ): String = "property removed $key ${oldReportEntries.find(id, key)}"
   }
 
   class ChangedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
     override fun describe(
       oldReportEntries: List<EncodedMetadataStore>,
       newReportEntries: List<EncodedMetadataStore>
-    ): String = "property changed $key ${oldReportEntries.first { it.id == id }.properties[key]!!.value} to ${newReportEntries.first { it.id == id }.properties[key]!!.value}"
+    ): String = "property changed $key ${oldReportEntries.find(id, key)} to ${newReportEntries.find(id, key)}"
   }
 }
+
+private fun List<EncodedMetadataStore>.find(id: String): EncodedMetadataStore =
+  first { it.id == id }
+private fun List<EncodedMetadataStore>.find(id: String, key: String): EncodedMetadataStore.EncodedMetadataProperty =
+  find(id).properties[key]!!

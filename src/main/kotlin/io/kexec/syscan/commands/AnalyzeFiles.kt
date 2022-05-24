@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import io.kexec.syscan.artifact.AnalysisContext
 import io.kexec.syscan.artifact.AnalysisSteps
 import io.kexec.syscan.artifact.Artifact
 import io.kexec.syscan.artifact.FileArtifact
@@ -19,8 +20,8 @@ import kotlin.io.path.outputStream
 
 class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") {
   private val roots by option("--root", "-r").fsPath(mustExist = true, canBeFile = false).multiple()
-
   private val outputFilePath by option("--output-file-path", "-o").fsPath()
+  private val skipStepList by option("--skip-step", "-S").multiple()
 
   private val pool by requireObject<TaskPool>()
 
@@ -29,7 +30,7 @@ class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") 
     val steps = planner.plan()
 
     val encodeMetadata = { store: MetadataStore ->
-      Json.encodeToString(MetadataStore.serializer(), store)
+      store.encodeToJson().toString()
     }
 
     if (outputFilePath != null && outputFilePath!!.exists()) {
@@ -39,11 +40,25 @@ class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") 
     val outputFileStream = outputFilePath?.toJavaPath()?.outputStream()
     val outputPrintStream = if (outputFileStream != null) PrintStream(outputFileStream) else System.out
 
-    val analyze = { artifact: Artifact ->
+    var analyze: ((Artifact) -> Unit)? = null
+
+    val context = object : AnalysisContext {
+      override fun emit(artifact: Artifact) {
+        pool.submit {
+          analyze!!(artifact)
+        }
+      }
+    }
+
+    analyze = { artifact: Artifact ->
       for (step in steps) {
+        if (skipStepList.contains(step.metadataSourceKey)) {
+          continue
+        }
+
         try {
           if (artifact.hasMetadataWants(step)) {
-            step.analyze(artifact)
+            step.analyze(context, artifact)
           }
         } catch (e: Exception) {
           System.err.println("ERROR while analyzing artifact $artifact in step ${step.metadataSourceKey}")
@@ -57,6 +72,8 @@ class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") 
           outputPrintStream.println(encoded)
         }
       }
+
+      artifact.cleanup()
     }
 
     val visitor = ArtifactPathVisitor { artifact ->
