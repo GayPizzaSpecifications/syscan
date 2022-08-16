@@ -37,5 +37,5 @@ tasks.withType<Wrapper> {
 }
 
 application {
-  mainClass.set("io.kexec.syscan.MainKt")
+  mainClass.set("lgbt.mystic.syscan.MainKt")
 }
