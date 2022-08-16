@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   application
 
-  kotlin("jvm") version "1.6.21"
-  kotlin("plugin.serialization") version "1.6.21"
+  kotlin("jvm") version "1.7.10"
+  kotlin("plugin.serialization") version "1.7.10"
 
   id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -22,9 +22,9 @@ java {
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-bom")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-  implementation("com.github.ajalt.clikt:clikt:3.4.2")
-  implementation("com.zaxxer:nuprocess:2.0.2")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+  implementation("com.github.ajalt.clikt:clikt:3.5.0")
+  implementation("com.zaxxer:nuprocess:2.0.3")
 }
 
 tasks.withType<KotlinCompile> {
@@ -32,7 +32,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Wrapper> {
-  gradleVersion = "7.4.2"
+  gradleVersion = "7.5.1"
   distributionType = Wrapper.DistributionType.ALL
 }
 

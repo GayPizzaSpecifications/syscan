@@ -15,7 +15,7 @@ import java.time.Instant
 
 @Serializable(with = MetadataStoreSerializer::class)
 class MetadataStore(val id: String) {
-  internal val metadata = PlatformConcurrentMap<MetadataKey<*>, MetadataEntry<*>>()
+  internal val metadata = PlatformConcurrentMap<AnyMetadataKey, MetadataEntry<*>>()
 
   fun <T> set(source: MetadataSource, key: MetadataKey<T>, value: T, converter: (T) -> JsonElement) {
     metadata[key] = MetadataEntry(source, value, converter)

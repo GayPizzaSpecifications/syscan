@@ -2,7 +2,7 @@ package io.kexec.syscan.metadata
 
 class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
   fun plan(): List<T> {
-    val whatProvides = mutableMapOf<MetadataKey<*>, T>()
+    val whatProvides = mutableMapOf<AnyMetadataKey, T>()
     for (source in sources) {
       val sourceProvides = source.provides
       for (provide in sourceProvides) {
@@ -28,14 +28,14 @@ class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
       }
     }
 
-    val extrapolatedKeyDependencies = mutableMapOf<MetadataKey<*>, List<MetadataKey<*>>>()
+    val extrapolatedKeyDependencies = mutableMapOf<AnyMetadataKey, List<AnyMetadataKey>>()
     for ((key, source) in whatProvides) {
       val requires = source.wants
       extrapolatedKeyDependencies[key] = requires.map { it.key }
     }
 
-    val stack = mutableListOf<MetadataKey<*>>()
-    val visited = mutableSetOf<MetadataKey<*>>()
+    val stack = mutableListOf<AnyMetadataKey>()
+    val visited = mutableSetOf<AnyMetadataKey>()
 
     for (key in whatProvides.keys) {
       resolve(key, stack, mutableSetOf(), visited, extrapolatedKeyDependencies)
@@ -59,11 +59,11 @@ class MetadataSourcePlanner<T : MetadataSource>(private val sources: List<T>) {
   }
 
   private fun resolve(
-    key: MetadataKey<*>,
-    stack: MutableList<MetadataKey<*>>,
-    resolving: MutableSet<MetadataKey<*>>,
-    visited: MutableSet<MetadataKey<*>>,
-    dependencies: Map<MetadataKey<*>, List<MetadataKey<*>>>
+    key: AnyMetadataKey,
+    stack: MutableList<AnyMetadataKey>,
+    resolving: MutableSet<AnyMetadataKey>,
+    visited: MutableSet<AnyMetadataKey>,
+    dependencies: Map<AnyMetadataKey, List<AnyMetadataKey>>
   ) {
     val dependenciesOfKey = dependencies[key]
     if (dependenciesOfKey != null) {
