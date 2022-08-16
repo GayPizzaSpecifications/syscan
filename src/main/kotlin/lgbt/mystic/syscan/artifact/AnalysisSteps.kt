@@ -1,11 +1,11 @@
 package lgbt.mystic.syscan.artifact
 
 import lgbt.mystic.syscan.steps.files.*
-import lgbt.mystic.syscan.steps.systems.JavaVirtualMachinePropertiesStep
+import lgbt.mystic.syscan.steps.systems.JvmPropertiesStep
 
 object AnalysisSteps {
   val systems = listOf(
-    JavaVirtualMachinePropertiesStep
+    JvmPropertiesStep
   )
 
   val files = listOf(

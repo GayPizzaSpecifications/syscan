@@ -9,7 +9,7 @@ import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.SystemMetadataKeys
 import lgbt.mystic.syscan.system.AnalysisSystem
 
-object JavaVirtualMachinePropertiesStep : AnalysisStep {
+object JvmPropertiesStep : AnalysisStep {
   override val wants: MetadataWants = emptyList()
   override val provides: MetadataKeys = emptyList()
 

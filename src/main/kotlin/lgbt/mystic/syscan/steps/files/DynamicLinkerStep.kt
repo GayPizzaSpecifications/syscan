@@ -32,7 +32,9 @@ object DynamicLinkerStep : AnalysisStep {
       return
     }
     val lines = result.stdoutAsString.lines()
-    val linkedLibraryLines = lines.filter { it.startsWith("\t") }.map { it.trim() }
+    val linkedLibraryLines = lines
+      .filter { it.startsWith("\t") }
+      .map { it.trim() }
     val linkedFiles = linkedLibraryLines.asSequence()
       .map { it.split("(").first().trim() }
       .distinct()
@@ -44,9 +46,11 @@ object DynamicLinkerStep : AnalysisStep {
       this,
       FileMetadataKeys.DynamicLinkerLinkedFiles,
       FsPathSerializer,
-      linkedFiles)
+      linkedFiles
+    )
 
-    val linkedFrameworks = linkedFiles.asSequence().filter { it.fullPathString.contains(".framework/") }
+    val linkedFrameworks = linkedFiles.asSequence()
+      .filter { it.fullPathString.contains(".framework/") }
       .map { it.fullPathString.split(".framework/").first() + ".framework" }
       .map { PlatformPath(it) }
       .distinct()
