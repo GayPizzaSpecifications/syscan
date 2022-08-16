@@ -7,6 +7,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -36,6 +37,9 @@ class MetadataStore(val kind: ArtifactKind, val id: String) {
 
   fun set(source: MetadataSource, key: MetadataKey<List<String>>, value: List<String>) =
     set(source, key, ListSerializer(String.serializer()), value)
+
+  fun set(source: MetadataSource, key: MetadataKey<Map<String, String>>, value: Map<String, String>) =
+    set(source, key, MapSerializer(String.serializer(), String.serializer()), value)
 
   fun set(source: MetadataSource, key: MetadataKey<FsPath>, value: FsPath) =
     set(source, key, FsPathSerializer, value)

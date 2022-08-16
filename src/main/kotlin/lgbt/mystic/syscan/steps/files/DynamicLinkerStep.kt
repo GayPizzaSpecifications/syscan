@@ -1,4 +1,4 @@
-package lgbt.mystic.syscan.steps
+package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformPath
 import lgbt.mystic.syscan.PlatformProcessSpawner
@@ -7,18 +7,19 @@ import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.io.FsPathSerializer
 import lgbt.mystic.syscan.metadata.*
+import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
 object DynamicLinkerStep : AnalysisStep {
-  override val wants: MetadataWants = listOf(CommonMetadataKeys.ReadableFilePath.want(), CommonMetadataKeys.MimeType.want())
-  override val provides: MetadataKeys = listOf(CommonMetadataKeys.DynamicLinkerLinkedFiles)
+  override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want(), FileMetadataKeys.MimeType.want())
+  override val provides: MetadataKeys = listOf(FileMetadataKeys.DynamicLinkerLinkedFiles)
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
-    val mime = artifact.metadata.require(CommonMetadataKeys.MimeType)
+    val mime = artifact.metadata.require(FileMetadataKeys.MimeType)
     if (mime != MachBinaryType) {
       return
     }
 
-    val path = artifact.metadata.require(CommonMetadataKeys.ReadableFilePath)
+    val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
 
     val result = PlatformProcessSpawner.execute(
       "otool", listOf(
@@ -41,7 +42,7 @@ object DynamicLinkerStep : AnalysisStep {
 
     artifact.metadata.setList(
       this,
-      CommonMetadataKeys.DynamicLinkerLinkedFiles,
+      FileMetadataKeys.DynamicLinkerLinkedFiles,
       FsPathSerializer,
       linkedFiles)
 
@@ -53,7 +54,7 @@ object DynamicLinkerStep : AnalysisStep {
 
     artifact.metadata.setList(
       this,
-      CommonMetadataKeys.DynamicLinkerLinkedFrameworks,
+      FileMetadataKeys.DynamicLinkerLinkedFrameworks,
       FsPathSerializer,
       linkedFrameworks
     )

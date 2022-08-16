@@ -1,9 +1,10 @@
-package lgbt.mystic.syscan.metadata
+package lgbt.mystic.syscan.metadata.keys
 
 import lgbt.mystic.syscan.io.FsPath
+import lgbt.mystic.syscan.metadata.MetadataKey
 import java.time.Instant
 
-object CommonMetadataKeys {
+object FileMetadataKeys {
   val ReadableFilePath = MetadataKey<FsPath>("filesystem", "readable-path", encodable = false)
   val VirtualFilePath = MetadataKey<FsPath>("filesystem", "path")
 
@@ -19,6 +20,4 @@ object CommonMetadataKeys {
   val UniversalBinaryArchitectures = MetadataKey<List<String>>("universal-binary", "architectures")
   val DynamicLinkerLinkedFiles = MetadataKey<List<FsPath>>("dynamic-linker", "linked-files")
   val DynamicLinkerLinkedFrameworks = MetadataKey<List<FsPath>>("dynamic-linker", "linked-frameworks")
-
-  val OperatingSystemName = MetadataKey<String>("operating-system", "name")
 }

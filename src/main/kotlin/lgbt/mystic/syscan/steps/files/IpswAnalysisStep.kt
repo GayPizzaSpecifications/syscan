@@ -1,4 +1,4 @@
-package lgbt.mystic.syscan.steps
+package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformCreateTempDir
 import lgbt.mystic.syscan.PlatformPath
@@ -13,13 +13,14 @@ import lgbt.mystic.syscan.io.FsPath
 import lgbt.mystic.syscan.io.deleteRecursively
 import lgbt.mystic.syscan.metadata.*
 import kotlinx.serialization.json.Json
+import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
 object IpswAnalysisStep : AnalysisStep {
-  override val wants: MetadataWants = listOf(CommonMetadataKeys.ReadableFilePath.want())
+  override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want())
   override val provides: MetadataKeys = listOf()
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
-    val path = artifact.metadata.require(CommonMetadataKeys.ReadableFilePath)
+    val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
     if (!path.fullPathString.startsWith("/System/Library/dyld/") ||
           !path.entityNameString.startsWith("dyld_shared_cache_") ||
         path.fullPathString.contains(".")) {

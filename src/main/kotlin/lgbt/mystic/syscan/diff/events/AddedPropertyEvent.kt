@@ -1,0 +1,11 @@
+package lgbt.mystic.syscan.diff.events
+
+import lgbt.mystic.syscan.metadata.find
+import lgbt.mystic.syscan.metadata.EncodedMetadataStore
+
+class AddedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
+  override fun describe(
+    oldReportEntries: List<EncodedMetadataStore>,
+    newReportEntries: List<EncodedMetadataStore>
+  ): String = "property added $id ${newReportEntries.find(id, key)}"
+}

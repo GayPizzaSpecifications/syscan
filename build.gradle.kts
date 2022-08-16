@@ -37,5 +37,5 @@ tasks.withType<Wrapper> {
 }
 
 application {
-  mainClass.set("lgbt.mystic.syscan.MainKt")
+  mainClass.set("lgbt.mystic.syscan.tool.MainKt")
 }

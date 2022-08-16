@@ -1,7 +1,8 @@
-package lgbt.mystic.syscan.commands
+package lgbt.mystic.syscan.tool
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import lgbt.mystic.syscan.artifact.*
@@ -14,12 +15,15 @@ import lgbt.mystic.syscan.metadata.hasMetadataWants
 import lgbt.mystic.syscan.pipeline.PooledPipeline
 import lgbt.mystic.syscan.system.CurrentSystem
 import java.io.PrintStream
+import java.nio.file.Path
 import kotlin.io.path.outputStream
 
-class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
+class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
   private val roots by option("--root", "-r").fsPath(mustExist = true, canBeFile = false).multiple()
   private val outputFilePath by option("--output-file-path", "-o").fsPath()
   private val skipStepList by option("--skip-step", "-S").multiple()
+
+  private val restrictive by option("--restrictive", "-R").flag()
 
   private val pool by requireObject<TaskPool>()
 
@@ -38,9 +42,27 @@ class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
 
     val pipeline = PooledPipeline<Artifact>(pool)
 
+    val visitor = ArtifactPathVisitor { artifact ->
+      pipeline.emit(artifact)
+    }
+
     val context = object : AnalysisContext {
       override fun emit(artifact: Artifact) {
+        if (restrictive) {
+          return
+        }
+
         pipeline.emit(artifact)
+      }
+
+      override fun scan(path: FsPath) {
+        if (restrictive) {
+          return
+        }
+
+        pipeline.pool.submit {
+          path.visit(visitor)
+        }
       }
     }
 
@@ -48,12 +70,10 @@ class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
       handleArtifact(artifact, context, steps)
     }
 
-    val visitor = ArtifactPathVisitor { artifact ->
-      pipeline.emit(artifact)
-    }
-
     roots.forEach { root ->
-      root.visit(visitor)
+      pool.submit {
+        root.visit(visitor)
+      }
     }
 
     pipeline.emit(CurrentSystem)
@@ -61,7 +81,7 @@ class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
     pool.waitAndStop()
   }
 
-  fun handleArtifact(artifact: Artifact, context: AnalysisContext, steps: List<AnalysisStep>) {
+  private fun handleArtifact(artifact: Artifact, context: AnalysisContext, steps: List<AnalysisStep>) {
     for (step in steps) {
       if (skipStepList.contains(step.metadataSourceKey)) {
         continue
@@ -85,7 +105,7 @@ class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
     artifact.cleanup()
   }
 
-  fun encodeMetadata(store: MetadataStore): String =
+  private fun encodeMetadata(store: MetadataStore): String =
     store.encodeToJson().toString()
 
   private class ArtifactPathVisitor(val block: (Artifact) -> Unit) : FsPathVisitor {

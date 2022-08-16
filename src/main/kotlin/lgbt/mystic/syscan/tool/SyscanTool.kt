@@ -1,13 +1,15 @@
-package lgbt.mystic.syscan
+package lgbt.mystic.syscan.tool
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
+import lgbt.mystic.syscan.PlatformInit
+import lgbt.mystic.syscan.PlatformTaskPool
 import lgbt.mystic.syscan.concurrent.SyncTaskPool
 
-class SyscanCommand : CliktCommand(help = "System Scan Tool", name = "syscan", invokeWithoutSubcommand = true) {
+class SyscanTool : CliktCommand(help = "System Scan Tool", name = "syscan", invokeWithoutSubcommand = true) {
   private val concurrency by option("--concurrency", "-c", help = "Task Concurrency").int().default(4)
   private val isSingleThreaded by option("--synchronous", "-s").flag()
 

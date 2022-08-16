@@ -1,5 +1,6 @@
 package lgbt.mystic.syscan.diff
 
+import lgbt.mystic.syscan.diff.events.*
 import lgbt.mystic.syscan.metadata.EncodedMetadataStore
 
 class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newReportEntries: List<EncodedMetadataStore>) {
@@ -55,47 +56,4 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
 
   fun describe(event: DiffEvent): String = event.describe(oldReportEntries, newReportEntries)
 
-  abstract class DiffEvent(val id: String) {
-    abstract fun describe(oldReportEntries: List<EncodedMetadataStore>, newReportEntries: List<EncodedMetadataStore>): String
-  }
-
-  class RemovedEntryEvent(id: String) : DiffEvent(id) {
-    override fun describe(
-      oldReportEntries: List<EncodedMetadataStore>,
-      newReportEntries: List<EncodedMetadataStore>
-    ): String = "entry removed $id"
-  }
-
-  class AddedEntryEvent(id: String) : DiffEvent(id) {
-    override fun describe(
-      oldReportEntries: List<EncodedMetadataStore>,
-      newReportEntries: List<EncodedMetadataStore>
-    ): String = "entry added $id ${newReportEntries.find(id).encodeToJson()}"
-  }
-
-  class AddedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
-    override fun describe(
-      oldReportEntries: List<EncodedMetadataStore>,
-      newReportEntries: List<EncodedMetadataStore>
-    ): String = "property added $id ${newReportEntries.find(id, key)}"
-  }
-
-  class RemovedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
-    override fun describe(
-      oldReportEntries: List<EncodedMetadataStore>,
-      newReportEntries: List<EncodedMetadataStore>
-    ): String = "property removed $key ${oldReportEntries.find(id, key)}"
-  }
-
-  class ChangedPropertyEvent(id: String, val key: String) : DiffEvent(id) {
-    override fun describe(
-      oldReportEntries: List<EncodedMetadataStore>,
-      newReportEntries: List<EncodedMetadataStore>
-    ): String = "property changed $key ${oldReportEntries.find(id, key)} to ${newReportEntries.find(id, key)}"
-  }
 }
-
-private fun List<EncodedMetadataStore>.find(id: String): EncodedMetadataStore =
-  first { it.id == id }
-private fun List<EncodedMetadataStore>.find(id: String, key: String): EncodedMetadataStore.EncodedMetadataProperty =
-  find(id).properties[key]!!
