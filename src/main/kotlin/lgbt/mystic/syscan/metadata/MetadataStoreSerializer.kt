@@ -26,6 +26,6 @@ class MetadataStoreSerializer : KSerializer<MetadataStore> {
       )
       properties["${key.namespace}:${key.id}"] = property
     }
-    EncodedMetadataStore.serializer().serialize(encoder, EncodedMetadataStore(value.id, properties))
+    EncodedMetadataStore.serializer().serialize(encoder, EncodedMetadataStore(value.kind.id, value.id, properties))
   }
 }

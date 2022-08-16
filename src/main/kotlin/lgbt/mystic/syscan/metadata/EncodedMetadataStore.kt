@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class EncodedMetadataStore(
+  val kind: String,
   val id: String,
   val properties: Map<String, EncodedMetadataProperty>
 ) {

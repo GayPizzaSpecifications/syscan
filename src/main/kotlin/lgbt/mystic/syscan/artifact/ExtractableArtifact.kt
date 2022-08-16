@@ -5,7 +5,7 @@ import lgbt.mystic.syscan.io.delete
 import lgbt.mystic.syscan.metadata.CommonMetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataSource
 
-abstract class ExtractableArtifact(id: String, val virtualFilePath: FsPath) : Artifact(id) {
+abstract class ExtractableArtifact(id: String, val virtualFilePath: FsPath) : Artifact(ArtifactKinds.File, id) {
   protected abstract fun extractToFile(): FsPath
 
   fun prepare(source: MetadataSource) {

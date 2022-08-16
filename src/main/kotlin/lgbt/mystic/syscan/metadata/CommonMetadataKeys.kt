@@ -19,4 +19,6 @@ object CommonMetadataKeys {
   val UniversalBinaryArchitectures = MetadataKey<List<String>>("universal-binary", "architectures")
   val DynamicLinkerLinkedFiles = MetadataKey<List<FsPath>>("dynamic-linker", "linked-files")
   val DynamicLinkerLinkedFrameworks = MetadataKey<List<FsPath>>("dynamic-linker", "linked-frameworks")
+
+  val OperatingSystemName = MetadataKey<String>("operating-system", "name")
 }

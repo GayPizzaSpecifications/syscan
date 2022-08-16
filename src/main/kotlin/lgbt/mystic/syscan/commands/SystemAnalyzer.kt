@@ -12,10 +12,11 @@ import lgbt.mystic.syscan.metadata.MetadataSourcePlanner
 import lgbt.mystic.syscan.metadata.MetadataStore
 import lgbt.mystic.syscan.metadata.hasMetadataWants
 import lgbt.mystic.syscan.pipeline.PooledPipeline
+import lgbt.mystic.syscan.system.CurrentSystem
 import java.io.PrintStream
 import kotlin.io.path.outputStream
 
-class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") {
+class SystemAnalyzer : CliktCommand("System Analyzer", name = "analyze") {
   private val roots by option("--root", "-r").fsPath(mustExist = true, canBeFile = false).multiple()
   private val outputFilePath by option("--output-file-path", "-o").fsPath()
   private val skipStepList by option("--skip-step", "-S").multiple()
@@ -54,6 +55,9 @@ class AnalyzeFiles : CliktCommand("Artifact Discovery", name = "analyze-files") 
     roots.forEach { root ->
       root.visit(visitor)
     }
+
+    pipeline.emit(CurrentSystem)
+
     pool.waitAndStop()
   }
 
