@@ -14,7 +14,7 @@ import lgbt.mystic.syscan.metadata.MetadataStore
 import lgbt.mystic.syscan.metadata.satisfiesMetadataWantsOf
 import lgbt.mystic.syscan.pipeline.PooledPipeline
 import lgbt.mystic.syscan.pipeline.SimplePipeline
-import lgbt.mystic.syscan.system.CurrentSystem
+import lgbt.mystic.syscan.system.AnalysisSystem
 import java.io.PrintStream
 import kotlin.io.path.outputStream
 
@@ -76,7 +76,8 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
       }
     }
 
-    pipeline.emit(CurrentSystem)
+    val localSystem = AnalysisSystem("local-system")
+    pipeline.emit(localSystem)
 
     pool.waitAndStop()
   }

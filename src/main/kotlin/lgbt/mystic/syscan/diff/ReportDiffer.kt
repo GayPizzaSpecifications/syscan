@@ -55,5 +55,4 @@ class ReportDiffer(val oldReportEntries: List<EncodedMetadataStore>, val newRepo
   }
 
   fun describe(event: DiffEvent): String = event.describe(oldReportEntries, newReportEntries)
-
 }
