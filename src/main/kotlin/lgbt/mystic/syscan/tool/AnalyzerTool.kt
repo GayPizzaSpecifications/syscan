@@ -13,6 +13,7 @@ import lgbt.mystic.syscan.metadata.MetadataSourcePlanner
 import lgbt.mystic.syscan.metadata.MetadataStore
 import lgbt.mystic.syscan.metadata.satisfiesMetadataWantsOf
 import lgbt.mystic.syscan.pipeline.PooledPipeline
+import lgbt.mystic.syscan.pipeline.SimplePipeline
 import lgbt.mystic.syscan.system.CurrentSystem
 import java.io.PrintStream
 import kotlin.io.path.outputStream
@@ -39,7 +40,7 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
     val outputFileStream = outputFilePath?.toJavaPath()?.outputStream()
     outputPrintStream = if (outputFileStream != null) PrintStream(outputFileStream) else System.out
 
-    val pipeline = PooledPipeline<Artifact>(pool)
+    val pipeline = PooledPipeline<Artifact>(SimplePipeline(), pool)
 
     val visitor = ArtifactPathVisitor { artifact ->
       pipeline.emit(artifact)

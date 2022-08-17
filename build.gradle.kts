@@ -13,6 +13,11 @@ repositories {
   mavenCentral()
 }
 
+sourceSets.create("constructs").apply {
+  compileClasspath += sourceSets.main.get().output
+  runtimeClasspath += sourceSets.main.get().output
+}
+
 java {
   val javaVersion = JavaVersion.toVersion(17)
   sourceCompatibility = javaVersion

@@ -2,10 +2,10 @@ package lgbt.mystic.syscan.pipeline
 
 import lgbt.mystic.syscan.concurrent.TaskPool
 
-class PooledPipeline<T>(val pool: TaskPool): Pipeline<T>() {
-  override fun emit(value: T) {
+class PooledPipeline<T>(private val delegate: Pipeline<T>, val pool: TaskPool): Pipeline<T> by delegate {
+  override fun emit(item: T) {
     pool.submit {
-      super.emit(value)
+      delegate.emit(item)
     }
   }
 }
