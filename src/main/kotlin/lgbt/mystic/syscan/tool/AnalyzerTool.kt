@@ -11,11 +11,10 @@ import lgbt.mystic.syscan.io.*
 import lgbt.mystic.syscan.io.java.toJavaPath
 import lgbt.mystic.syscan.metadata.MetadataSourcePlanner
 import lgbt.mystic.syscan.metadata.MetadataStore
-import lgbt.mystic.syscan.metadata.hasMetadataWants
+import lgbt.mystic.syscan.metadata.satisfiesMetadataWantsOf
 import lgbt.mystic.syscan.pipeline.PooledPipeline
 import lgbt.mystic.syscan.system.CurrentSystem
 import java.io.PrintStream
-import java.nio.file.Path
 import kotlin.io.path.outputStream
 
 class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
@@ -88,7 +87,7 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
       }
 
       try {
-        if (artifact.hasMetadataWants(step)) {
+        if (artifact.satisfiesMetadataWantsOf(step) && step.valid(artifact)) {
           step.analyze(context, artifact)
         }
       } catch (e: Exception) {

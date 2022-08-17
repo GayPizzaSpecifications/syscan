@@ -1,16 +1,15 @@
 package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.artifact.AnalysisContext
-import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.artifact.FileArtifact
-import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 import lgbt.mystic.syscan.io.isExecutable
 import lgbt.mystic.syscan.io.lastModifiedTime
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
+import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
-object FileInfoStep : AnalysisStep {
+object FileInfoStep : FileAnalysisStep {
   override val wants: MetadataWants = emptyList()
   override val provides: MetadataKeys = listOf(FileMetadataKeys.ReadableFilePath, FileMetadataKeys.ExecutableFileMarker)
 

@@ -1,21 +1,21 @@
 package lgbt.mystic.syscan.steps.files
 
+import kotlinx.serialization.json.Json
 import lgbt.mystic.syscan.PlatformCreateTempDir
 import lgbt.mystic.syscan.PlatformPath
 import lgbt.mystic.syscan.PlatformProcessSpawner
 import lgbt.mystic.syscan.artifact.AnalysisContext
-import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.artifact.ExtractableArtifact
 import lgbt.mystic.syscan.dyld.IpswSharedCacheDylib
 import lgbt.mystic.syscan.dyld.IpswSharedCacheList
 import lgbt.mystic.syscan.io.FsPath
 import lgbt.mystic.syscan.io.deleteRecursively
-import lgbt.mystic.syscan.metadata.*
-import kotlinx.serialization.json.Json
+import lgbt.mystic.syscan.metadata.MetadataKeys
+import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
-object IpswAnalysisStep : AnalysisStep {
+object IpswAnalysisStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want())
   override val provides: MetadataKeys = listOf()
 

@@ -2,12 +2,12 @@ package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformProcessSpawner
 import lgbt.mystic.syscan.artifact.AnalysisContext
-import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
-import lgbt.mystic.syscan.metadata.*
+import lgbt.mystic.syscan.metadata.MetadataKeys
+import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
-object UniversalBinaryStep : AnalysisStep {
+object UniversalBinaryStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want(), FileMetadataKeys.MimeType.want())
   override val provides: MetadataKeys = listOf(FileMetadataKeys.UniversalBinaryArchitectures)
 

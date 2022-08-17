@@ -12,11 +12,10 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-import lgbt.mystic.syscan.artifact.ArtifactKind
 import java.time.Instant
 
 @Serializable(with = MetadataStoreSerializer::class)
-class MetadataStore(val kind: ArtifactKind, val id: String) {
+class MetadataStore(val kind: MetadataKind, val id: String) {
   internal val metadata = PlatformConcurrentMap<AnyMetadataKey, MetadataEntry<*>>()
 
   fun <T> set(source: MetadataSource, key: MetadataKey<T>, value: T, converter: (T) -> JsonElement) {

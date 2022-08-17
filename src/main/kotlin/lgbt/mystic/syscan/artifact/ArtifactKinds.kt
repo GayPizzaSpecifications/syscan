@@ -1,6 +1,8 @@
 package lgbt.mystic.syscan.artifact
 
+import lgbt.mystic.syscan.metadata.MetadataKind
+
 object ArtifactKinds {
-  val File = ArtifactKind("file")
-  val System = ArtifactKind("system")
+  val File = MetadataKind("file")
+  val System = MetadataKind("system")
 }

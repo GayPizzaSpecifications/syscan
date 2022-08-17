@@ -2,13 +2,13 @@ package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformHash
 import lgbt.mystic.syscan.artifact.AnalysisContext
-import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.io.readBytesChunked
-import lgbt.mystic.syscan.metadata.*
+import lgbt.mystic.syscan.metadata.MetadataKeys
+import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
-object FileHashStep : AnalysisStep {
+object FileHashStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want())
   override val provides: MetadataKeys = listOf(
     FileMetadataKeys.HashMd5,

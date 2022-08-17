@@ -1,7 +1,6 @@
 package lgbt.mystic.syscan.steps.systems
 
 import lgbt.mystic.syscan.artifact.AnalysisContext
-import lgbt.mystic.syscan.artifact.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.metadata.MetadataKey
 import lgbt.mystic.syscan.metadata.MetadataKeys
@@ -9,7 +8,7 @@ import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.SystemMetadataKeys
 import lgbt.mystic.syscan.system.AnalysisSystem
 
-object JvmPropertiesStep : AnalysisStep {
+object JvmPropertiesStep : SystemAnalysisStep {
   override val wants: MetadataWants = emptyList()
   override val provides: MetadataKeys = emptyList()
 
