@@ -1,9 +1,9 @@
 package lgbt.mystic.syscan.concurrent
 
-object SyncTaskPool : TaskPool {
+object DirectTaskPool : TaskPool {
   override fun submit(task: () -> Unit) {
     task()
   }
 
-  override fun waitAndStop() {}
+  override fun closeAndAwait() {}
 }

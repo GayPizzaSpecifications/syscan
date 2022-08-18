@@ -79,7 +79,7 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
     val localSystem = AnalysisSystem("local-system")
     pipeline.emit(localSystem)
 
-    pool.waitAndStop()
+    pool.closeAndAwait()
   }
 
   private fun handleArtifact(artifact: Artifact, context: AnalysisContext, steps: List<AnalysisStep>) {
