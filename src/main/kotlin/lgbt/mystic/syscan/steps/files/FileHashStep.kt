@@ -19,6 +19,7 @@ object FileHashStep : FileAnalysisStep {
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
     val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
+
     val md5 = PlatformHash("MD5")
     val sha1 = PlatformHash("SHA-1")
     val sha256 = PlatformHash("SHA-256")

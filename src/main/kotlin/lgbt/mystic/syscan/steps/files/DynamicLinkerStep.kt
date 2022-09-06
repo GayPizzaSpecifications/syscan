@@ -39,7 +39,7 @@ object DynamicLinkerStep : FileAnalysisStep {
       .map { it.split("(").first().trim() }
       .distinct()
       .map { PlatformPath(it) }
-      .sortedBy { it.fullPathString }
+      .sorted()
       .toList()
 
     artifact.metadata.setList(
@@ -54,7 +54,8 @@ object DynamicLinkerStep : FileAnalysisStep {
       .map { it.fullPathString.split(".framework/").first() + ".framework" }
       .map { PlatformPath(it) }
       .distinct()
-      .sortedBy { it.fullPathString }.toList()
+      .sorted()
+      .toList()
 
     artifact.metadata.setList(
       this,

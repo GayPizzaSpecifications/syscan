@@ -3,7 +3,7 @@ package lgbt.mystic.syscan.io
 import kotlinx.serialization.Serializable
 
 @Serializable(with = FsPathSerializer::class)
-interface FsPath {
+interface FsPath : Comparable<FsPath> {
   val fullPathString: String
   val entityNameString: String
 
@@ -12,4 +12,8 @@ interface FsPath {
 
   fun resolve(part: String): FsPath
   fun relativeTo(path: FsPath): FsPath
+
+  override fun compareTo(other: FsPath): Int {
+    return fullPathString.compareTo(other.fullPathString)
+  }
 }
