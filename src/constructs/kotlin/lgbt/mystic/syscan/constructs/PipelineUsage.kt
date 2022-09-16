@@ -15,6 +15,6 @@ object PipelineUsage {
     val pool = PlatformTaskPool(2)
     val pooled = PooledPipeline(pipeline, pool)
     pooled.emit("Hello World")
-    pool.waitAndStop()
+    pool.closeAndAwait()
   }
 }

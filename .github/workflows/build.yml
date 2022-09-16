@@ -18,10 +18,10 @@ jobs:
       - name: Publish Distribution ZIP
         uses: actions/upload-artifact@v2
         with:
-          name: ksyscan.zip
-          path: build/distributions/ksyscan.zip
+          name: syscan.zip
+          path: build/distributions/syscan.zip
       - name: Publish Shadow JAR
         uses: actions/upload-artifact@v2
         with:
-          name: ksyscan-all.jar
-          path: build/libs/ksyscan-all.jar
+          name: syscan-all.jar
+          path: build/libs/syscan-all.jar
