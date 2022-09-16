@@ -1,6 +1,6 @@
 package lgbt.mystic.syscan.steps.systems
 
-import lgbt.mystic.syscan.artifact.AnalysisStep
+import lgbt.mystic.syscan.analysis.AnalysisStep
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.artifact.ArtifactKinds
 

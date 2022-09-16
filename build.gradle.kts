@@ -27,9 +27,9 @@ java {
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-bom")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
   implementation("com.github.ajalt.clikt:clikt:3.5.0")
-  implementation("com.zaxxer:nuprocess:2.0.3")
+  implementation("com.zaxxer:nuprocess:2.0.4")
 }
 
 tasks.withType<KotlinCompile> {

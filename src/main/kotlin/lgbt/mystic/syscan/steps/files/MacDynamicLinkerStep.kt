@@ -2,16 +2,23 @@ package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformPath
 import lgbt.mystic.syscan.PlatformProcessSpawner
-import lgbt.mystic.syscan.artifact.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisRequirements
+import lgbt.mystic.syscan.analysis.requirements.OperatingSystem
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.io.FsPathSerializer
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 
-object DynamicLinkerStep : FileAnalysisStep {
+object MacDynamicLinkerStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want(), FileMetadataKeys.MimeType.want())
   override val provides: MetadataKeys = listOf(FileMetadataKeys.DynamicLinkerLinkedFiles)
+
+  override fun required(requirements: AnalysisRequirements): Unit = requirements.run {
+    os(OperatingSystem.MacOS)
+    executable("otool")
+  }
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
     val mime = artifact.metadata.require(FileMetadataKeys.MimeType)

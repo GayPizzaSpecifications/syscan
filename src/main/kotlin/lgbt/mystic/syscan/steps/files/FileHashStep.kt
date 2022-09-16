@@ -1,7 +1,7 @@
 package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformHash
-import lgbt.mystic.syscan.artifact.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisContext
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.io.readBytesChunked
 import lgbt.mystic.syscan.metadata.MetadataKeys

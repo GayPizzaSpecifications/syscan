@@ -1,6 +1,6 @@
 package lgbt.mystic.syscan.steps.systems
 
-import lgbt.mystic.syscan.artifact.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisContext
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.metadata.MetadataKey
 import lgbt.mystic.syscan.metadata.MetadataKeys

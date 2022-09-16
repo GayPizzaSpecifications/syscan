@@ -12,8 +12,15 @@ import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 object JavaProcessSpawner : ProcessSpawner {
-  override fun execute(executable: String, args: List<String>, workingDirectory: FsPath?): ProcessResult {
+  override fun execute(executable: String, args: List<String>, workingDirectory: FsPath?, environment: Map<String, String>?): ProcessResult {
     val builder = NuProcessBuilder(listOf(executable, *args.toTypedArray()))
+
+    if (environment != null) {
+      for ((key, value) in environment) {
+        builder.environment()[key] = value
+      }
+    }
+
     if (workingDirectory != null) {
       builder.setCwd(workingDirectory.toJavaPath())
     }
@@ -21,7 +28,9 @@ object JavaProcessSpawner : ProcessSpawner {
     builder.setProcessListener(handler)
     val process = builder.start()
     val exitCode = process.waitFor(0, TimeUnit.SECONDS)
-    return handler.toProcessResult(exitCode)
+    val result = handler.toProcessResult(exitCode)
+    process.destroy(true)
+    return result
   }
 
   class BufferedProcessHandler : NuAbstractProcessHandler() {

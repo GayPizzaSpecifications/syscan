@@ -1,7 +1,7 @@
 package lgbt.mystic.syscan.steps.files
 
 import lgbt.mystic.syscan.PlatformProcessSpawner
-import lgbt.mystic.syscan.artifact.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisContext
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
@@ -17,7 +17,7 @@ object MagicFileStep : FileAnalysisStep {
       "--brief",
       "--mime-type",
       path.fullPathString
-    ))
+    ), environment = mapOf("POSIXLY_CORRECT" to "1"))
 
     if (result.exitCode != 0) {
       return

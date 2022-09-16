@@ -1,4 +1,4 @@
-package lgbt.mystic.syscan.artifact
+package lgbt.mystic.syscan.analysis
 
 import lgbt.mystic.syscan.steps.files.*
 import lgbt.mystic.syscan.steps.systems.JvmPropertiesStep
@@ -12,7 +12,7 @@ object AnalysisSteps {
     FileInfoStep,
     FileHashStep,
     UniversalBinaryStep,
-    DynamicLinkerStep,
+    MacDynamicLinkerStep,
     MagicFileStep,
     IpswAnalysisStep
   )

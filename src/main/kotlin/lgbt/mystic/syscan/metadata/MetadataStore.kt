@@ -65,4 +65,12 @@ class MetadataStore(val kind: MetadataKind, val id: String) {
   fun <T> has(it: MetadataKey<T>) = metadata[it] != null
 
   fun encodeToJson(): JsonElement = Json.encodeToJsonElement(serializer(), this)
+
+  fun asCategoryMap(): Map<String, Map<String, MetadataEntry<*>>> {
+    val result = mutableMapOf<String, MutableMap<String, MetadataEntry<*>>>()
+    for ((key, value) in metadata) {
+      result.computeIfAbsent(key.namespace){ mutableMapOf() }[key.id] = value
+    }
+    return result
+  }
 }

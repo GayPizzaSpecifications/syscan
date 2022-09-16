@@ -4,7 +4,9 @@ import kotlinx.serialization.json.Json
 import lgbt.mystic.syscan.PlatformCreateTempDir
 import lgbt.mystic.syscan.PlatformPath
 import lgbt.mystic.syscan.PlatformProcessSpawner
-import lgbt.mystic.syscan.artifact.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisContext
+import lgbt.mystic.syscan.analysis.AnalysisRequirements
+import lgbt.mystic.syscan.analysis.requirements.OperatingSystem
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.artifact.ExtractableArtifact
 import lgbt.mystic.syscan.dyld.IpswSharedCacheDylib
@@ -18,6 +20,11 @@ import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
 object IpswAnalysisStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want())
   override val provides: MetadataKeys = listOf()
+
+  override fun required(requirements: AnalysisRequirements): Unit = requirements.run {
+    os(OperatingSystem.MacOS)
+    executable("ipsw")
+  }
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
     val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)

@@ -2,19 +2,20 @@ package lgbt.mystic.syscan.tool
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.enum
+import lgbt.mystic.syscan.analysis.AnalysisStep
 import lgbt.mystic.syscan.artifact.*
 import lgbt.mystic.syscan.concurrent.TaskPool
+import lgbt.mystic.syscan.frontend.SystemAnalyzer
+import lgbt.mystic.syscan.frontend.SystemAnalyzerConfiguration
+import lgbt.mystic.syscan.frontend.SystemAnalyzerHandler
 import lgbt.mystic.syscan.io.*
 import lgbt.mystic.syscan.io.java.toJavaPath
-import lgbt.mystic.syscan.metadata.MetadataSourcePlanner
-import lgbt.mystic.syscan.metadata.MetadataStore
-import lgbt.mystic.syscan.metadata.satisfiesMetadataWantsOf
-import lgbt.mystic.syscan.pipeline.PooledPipeline
-import lgbt.mystic.syscan.pipeline.SimplePipeline
-import lgbt.mystic.syscan.system.AnalysisSystem
+import lgbt.mystic.syscan.tool.output.OutputFormats
 import java.io.PrintStream
 import kotlin.io.path.outputStream
 
@@ -25,14 +26,13 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
 
   private val restrictive by option("--restrictive", "-R").flag()
 
+  private val outputFormat by option("--format", "-f").enum<OutputFormats> { it.id }.default(OutputFormats.Json)
+
   private val pool by requireObject<TaskPool>()
 
   lateinit var outputPrintStream: PrintStream
 
   override fun run() {
-    val planner = MetadataSourcePlanner(AnalysisSteps.all)
-    val steps = planner.plan()
-
     if (outputFilePath != null && outputFilePath!!.exists()) {
       outputFilePath!!.delete()
     }
@@ -40,93 +40,33 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
     val outputFileStream = outputFilePath?.toJavaPath()?.outputStream()
     outputPrintStream = if (outputFileStream != null) PrintStream(outputFileStream) else System.out
 
-    val pipeline = PooledPipeline<Artifact>(SimplePipeline(), pool)
-
-    val visitor = ArtifactPathVisitor { artifact ->
-      pipeline.emit(artifact)
-    }
-
-    val context = object : AnalysisContext {
-      override fun emit(artifact: Artifact) {
-        if (restrictive) {
-          return
-        }
-
-        pipeline.emit(artifact)
-      }
-
-      override fun scan(path: FsPath) {
-        if (restrictive) {
-          return
-        }
-
-        pipeline.pool.submit {
-          path.visit(visitor)
-        }
-      }
-    }
-
-    pipeline.addHandler { artifact: Artifact ->
-      handleArtifact(artifact, context, steps)
-    }
-
-    roots.forEach { root ->
-      pool.submit {
-        root.visit(visitor)
-      }
-    }
-
-    val localSystem = AnalysisSystem("local-system")
-    pipeline.emit(localSystem)
-
+    val configuration = SystemAnalyzerConfiguration()
+    configuration.taskPool = pool
+    configuration.handler = AnalyzerHandler(this)
+    val analyzer = SystemAnalyzer(configuration)
+    roots.forEach { root -> analyzer.submitScanRoot(root) }
+    analyzer.submitLocalSystem()
     pool.closeAndAwait()
   }
 
-  private fun handleArtifact(artifact: Artifact, context: AnalysisContext, steps: List<AnalysisStep>) {
-    for (step in steps) {
-      if (skipStepList.contains(step.metadataSourceKey)) {
-        continue
-      }
+  class AnalyzerHandler(private val tool: AnalyzerTool) : SystemAnalyzerHandler {
+    override fun onArtifactStart(artifact: Artifact) {}
 
-      try {
-        if (artifact.satisfiesMetadataWantsOf(step) && step.valid(artifact)) {
-          step.analyze(context, artifact)
-        }
-      } catch (e: Exception) {
-        System.err.println("ERROR while analyzing artifact $artifact in step ${step.metadataSourceKey}")
-        e.printStackTrace()
+    override fun onArtifactEnd(artifact: Artifact) {
+      synchronized(tool.outputPrintStream) {
+        tool.outputFormat.format.write(tool.outputPrintStream, artifact)
       }
     }
 
-    val encoded = encodeMetadata(artifact.metadata)
-    synchronized(outputPrintStream) {
-      outputPrintStream.println(encoded)
+    override fun onArtifactStepError(artifact: Artifact, step: AnalysisStep, e: Throwable) {
+      System.err.println("ERROR while analyzing artifact $artifact in step ${step.metadataSourceKey}")
+      e.printStackTrace(System.err)
     }
 
-    artifact.cleanup()
-  }
+    override fun shouldRunStepOnArtifact(step: AnalysisStep, artifact: Artifact): Boolean =
+      !tool.skipStepList.contains(step.metadataSourceKey)
 
-  private fun encodeMetadata(store: MetadataStore): String =
-    store.encodeToJson().toString()
-
-  private class ArtifactPathVisitor(val block: (Artifact) -> Unit) : FsPathVisitor {
-    override fun beforeVisitDirectory(path: FsPath): FsPathVisitor.VisitResult {
-      return FsPathVisitor.VisitResult.Continue
-    }
-
-    override fun visitFile(path: FsPath): FsPathVisitor.VisitResult {
-      if (path.isExecutable() && path.isRegularFile()) {
-        block(FileArtifact(path))
-      }
-      return FsPathVisitor.VisitResult.Continue
-    }
-
-    override fun visitFileFailed(path: FsPath, exception: Exception): FsPathVisitor.VisitResult {
-      return FsPathVisitor.VisitResult.Continue
-    }
-
-    override fun afterVisitDirectory(path: FsPath): FsPathVisitor.VisitResult {
-      return FsPathVisitor.VisitResult.Continue
-    }
+    override fun acceptContextEmit(artifact: Artifact): Boolean = !tool.restrictive
+    override fun acceptContextRootScan(path: FsPath): Boolean = !tool.restrictive
   }
 }

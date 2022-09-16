@@ -9,7 +9,7 @@ class JavaHashResult(digest: MessageDigest): HashResult {
 
   override fun equals(other: Any?): Boolean {
     if (other !is HashResult) return false
-    return bytes.contentEquals(other.bytes)
+    return bytes contentEquals other.bytes
   }
 
   override fun hashCode(): Int {
