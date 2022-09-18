@@ -96,9 +96,7 @@ class SystemAnalyzer(val configuration: SystemAnalyzerConfiguration) {
     }
 
     override fun visitFile(path: FsPath): FsPathVisitor.VisitResult {
-      if (path.isExecutable() && path.isRegularFile()) {
-        block(FileArtifact(path))
-      }
+      block(FileArtifact(path))
       return FsPathVisitor.VisitResult.Continue
     }
 

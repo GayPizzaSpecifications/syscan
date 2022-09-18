@@ -46,7 +46,7 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
     val analyzer = SystemAnalyzer(configuration)
     roots.forEach { root -> analyzer.submitScanRoot(root) }
     analyzer.submitLocalSystem()
-    pool.closeAndAwait()
+    pool.await()
   }
 
   class AnalyzerHandler(private val tool: AnalyzerTool) : SystemAnalyzerHandler {

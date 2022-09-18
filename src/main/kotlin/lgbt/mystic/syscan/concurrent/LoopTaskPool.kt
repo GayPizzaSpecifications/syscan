@@ -7,14 +7,12 @@ class LoopTaskPool : TaskPool {
     tasks.add(task)
   }
 
-  fun flush() {
+  override fun await() {
     while (tasks.isNotEmpty()) {
       val task = tasks.removeAt(0)
       task()
     }
   }
 
-  override fun closeAndAwait() {
-    flush()
-  }
+  override fun close() {}
 }

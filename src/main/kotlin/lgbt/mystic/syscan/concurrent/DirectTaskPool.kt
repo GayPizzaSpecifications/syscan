@@ -5,5 +5,6 @@ object DirectTaskPool : TaskPool {
     task()
   }
 
-  override fun closeAndAwait() {}
+  override fun await() {}
+  override fun close() {}
 }

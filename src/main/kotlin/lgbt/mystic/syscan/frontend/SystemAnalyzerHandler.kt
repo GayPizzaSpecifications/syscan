@@ -13,5 +13,4 @@ interface SystemAnalyzerHandler {
 
   fun acceptContextEmit(artifact: Artifact): Boolean
   fun acceptContextRootScan(path: FsPath): Boolean
-
 }

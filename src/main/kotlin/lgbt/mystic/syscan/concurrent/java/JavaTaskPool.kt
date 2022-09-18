@@ -10,10 +10,13 @@ class JavaTaskPool(concurrency: Int) : TaskPool {
     pool.submit(task)
   }
 
-  override fun closeAndAwait() {
+  override fun await() {
     while (pool.activeCount != 0) {
       Thread.yield()
     }
+  }
+
+  override fun close() {
     pool.shutdown()
   }
 }
