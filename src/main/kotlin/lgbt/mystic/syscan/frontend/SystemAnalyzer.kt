@@ -48,7 +48,7 @@ class SystemAnalyzer(val configuration: SystemAnalyzerConfiguration) {
       }
     }
 
-    pipeline.addHandler { artifact: Artifact ->
+    pipeline.handle { artifact: Artifact ->
       handleArtifact(artifact, context, steps)
     }
   }

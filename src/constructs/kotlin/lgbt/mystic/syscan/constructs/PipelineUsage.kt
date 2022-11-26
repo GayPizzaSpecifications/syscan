@@ -8,7 +8,7 @@ object PipelineUsage {
   @JvmStatic
   fun main(args: Array<String>) {
     val pipeline = SimplePipeline<String>()
-    pipeline.addHandler { message ->
+    pipeline.handle { message ->
       println(message)
     }
 
