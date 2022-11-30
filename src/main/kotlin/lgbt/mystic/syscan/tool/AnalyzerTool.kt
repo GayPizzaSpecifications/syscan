@@ -7,13 +7,18 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.enum
+import lgbt.mystic.syscan.PlatformConcurrentMap
+import lgbt.mystic.syscan.PlatformEpochMilliseconds
 import lgbt.mystic.syscan.analysis.AnalysisStep
-import lgbt.mystic.syscan.artifact.*
+import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.concurrent.TaskPool
 import lgbt.mystic.syscan.frontend.SystemAnalyzer
 import lgbt.mystic.syscan.frontend.SystemAnalyzerConfiguration
 import lgbt.mystic.syscan.frontend.SystemAnalyzerHandler
-import lgbt.mystic.syscan.io.*
+import lgbt.mystic.syscan.io.FsPath
+import lgbt.mystic.syscan.io.delete
+import lgbt.mystic.syscan.io.exists
+import lgbt.mystic.syscan.io.fsPath
 import lgbt.mystic.syscan.io.java.toJavaPath
 import lgbt.mystic.syscan.tool.output.OutputFormats
 import java.io.PrintStream
@@ -28,6 +33,8 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
 
   private val outputFormat by option("--format", "-f").enum<OutputFormats> { it.id }.default(OutputFormats.Json)
 
+  private val measureTimeTaken by option("--measure-time", "-M").flag()
+
   private val pool by requireObject<TaskPool>()
 
   lateinit var outputPrintStream: PrintStream
@@ -41,20 +48,44 @@ class AnalyzerTool : CliktCommand("System Analyzer", name = "analyze") {
     outputPrintStream = if (outputFileStream != null) PrintStream(outputFileStream) else System.out
 
     val configuration = SystemAnalyzerConfiguration()
+    val handler = AnalyzerHandler(this)
     configuration.taskPool = pool
-    configuration.handler = AnalyzerHandler(this)
+    configuration.handler = handler
     val analyzer = SystemAnalyzer(configuration)
+    val start = PlatformEpochMilliseconds()
     roots.forEach { root -> analyzer.submitScanRoot(root) }
     analyzer.submitLocalSystem()
     pool.await()
+    val end = PlatformEpochMilliseconds()
+
+    if (measureTimeTaken) {
+      val averageTimeTakenMillis = handler.artifactTimingLog.average()
+      val maximumTimeTakenMillis = handler.artifactTimingLog.max()
+      val cpuTimeTakenMillis = handler.artifactTimingLog.sum()
+      val realTimeTakenMillis = end - start
+      val concurrencyEfficiencyFactor = cpuTimeTakenMillis.toDouble() / realTimeTakenMillis.toDouble()
+      System.err.println("average time ${averageTimeTakenMillis}ms, maximum time ${maximumTimeTakenMillis}ms, cpu time ${cpuTimeTakenMillis}ms, real time ${realTimeTakenMillis}ms, concurrency efficiency $concurrencyEfficiencyFactor")
+    }
   }
 
   class AnalyzerHandler(private val tool: AnalyzerTool) : SystemAnalyzerHandler {
-    override fun onArtifactStart(artifact: Artifact) {}
+    private val artifactAnalysisTimings = PlatformConcurrentMap<Artifact, Long>()
+    val artifactTimingLog = mutableListOf<Long>()
+
+    override fun onArtifactStart(artifact: Artifact) {
+      artifactAnalysisTimings[artifact] = PlatformEpochMilliseconds()
+    }
 
     override fun onArtifactEnd(artifact: Artifact) {
+      val endTimeMillis = PlatformEpochMilliseconds()
+      val startTimeMillis = artifactAnalysisTimings.remove(artifact)!!
+      val timeTakenMillis = endTimeMillis - startTimeMillis
       synchronized(tool.outputPrintStream) {
         tool.outputFormat.format.write(tool.outputPrintStream, artifact)
+      }
+
+      synchronized(artifactTimingLog) {
+        artifactTimingLog.add(timeTakenMillis)
       }
     }
 

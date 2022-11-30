@@ -3,6 +3,7 @@ package lgbt.mystic.syscan.steps.files
 import lgbt.mystic.syscan.analysis.AnalysisContext
 import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.artifact.FileArtifact
+import lgbt.mystic.syscan.io.exists
 import lgbt.mystic.syscan.io.isDirectory
 import lgbt.mystic.syscan.io.isExecutable
 import lgbt.mystic.syscan.io.lastModifiedTime
@@ -16,6 +17,10 @@ object FileInfoStep : FileAnalysisStep {
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
     if (artifact !is FileArtifact) {
+      return
+    }
+
+    if (!artifact.path.exists()) {
       return
     }
 

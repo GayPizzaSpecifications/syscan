@@ -10,6 +10,9 @@ import lgbt.mystic.syscan.io.FsPathSerializer
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
+import lgbt.mystic.syscan.process.command.CommandName
+import lgbt.mystic.syscan.process.command.RawArgument
+import lgbt.mystic.syscan.process.command.RelativeFilePath
 
 object MacDynamicLinkerStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want(), FileMetadataKeys.MimeType.want())
@@ -28,12 +31,11 @@ object MacDynamicLinkerStep : FileAnalysisStep {
 
     val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
 
-    val result = PlatformProcessSpawner.execute(
-      "otool", listOf(
-        "-L",
-        path.fullPathString
-      )
-    )
+    val result = PlatformProcessSpawner.execute(listOf(
+      CommandName("otool"),
+      RawArgument("-L"),
+      RelativeFilePath(path)
+    ))
 
     if (result.exitCode != 0) {
       return

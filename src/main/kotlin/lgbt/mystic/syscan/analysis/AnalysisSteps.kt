@@ -13,8 +13,7 @@ object AnalysisSteps {
     FileHashStep,
     UniversalBinaryStep,
     MacDynamicLinkerStep,
-    MagicFileStep,
-    IpswAnalysisStep
+    MagicFileStep
   )
 
   val all = systems + files

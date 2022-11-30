@@ -6,6 +6,9 @@ import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
+import lgbt.mystic.syscan.process.command.CommandName
+import lgbt.mystic.syscan.process.command.RawArgument
+import lgbt.mystic.syscan.process.command.RelativeFilePath
 
 object MagicFileStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want())
@@ -13,10 +16,11 @@ object MagicFileStep : FileAnalysisStep {
 
   override fun analyze(context: AnalysisContext, artifact: Artifact) {
     val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
-    val result = PlatformProcessSpawner.execute("file", listOf(
-      "--brief",
-      "--mime-type",
-      path.fullPathString
+    val result = PlatformProcessSpawner.execute(listOf(
+      CommandName("file"),
+      RawArgument("--brief"),
+      RawArgument("--mime-type"),
+      RelativeFilePath(path)
     ), environment = mapOf("POSIXLY_CORRECT" to "1"))
 
     if (result.exitCode != 0) {

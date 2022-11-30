@@ -8,6 +8,9 @@ import lgbt.mystic.syscan.artifact.Artifact
 import lgbt.mystic.syscan.metadata.MetadataKeys
 import lgbt.mystic.syscan.metadata.MetadataWants
 import lgbt.mystic.syscan.metadata.keys.FileMetadataKeys
+import lgbt.mystic.syscan.process.command.CommandName
+import lgbt.mystic.syscan.process.command.RawArgument
+import lgbt.mystic.syscan.process.command.RelativeFilePath
 
 object UniversalBinaryStep : FileAnalysisStep {
   override val wants: MetadataWants = listOf(FileMetadataKeys.ReadableFilePath.want(), FileMetadataKeys.MimeType.want())
@@ -25,9 +28,10 @@ object UniversalBinaryStep : FileAnalysisStep {
     }
 
     val path = artifact.metadata.require(FileMetadataKeys.ReadableFilePath)
-    val result = PlatformProcessSpawner.execute("lipo", listOf(
-      "-info",
-      path.fullPathString
+    val result = PlatformProcessSpawner.execute(listOf(
+      CommandName("lipo"),
+      RawArgument("-info"),
+      RelativeFilePath(path)
     ))
 
     if (result.exitCode != 0) {

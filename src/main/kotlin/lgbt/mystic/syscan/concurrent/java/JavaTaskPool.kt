@@ -4,7 +4,11 @@ import lgbt.mystic.syscan.concurrent.TaskPool
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class JavaTaskPool(concurrency: Int) : TaskPool {
-  private val pool = ScheduledThreadPoolExecutor(concurrency)
+  private val pool = ScheduledThreadPoolExecutor(concurrency) { task ->
+    Thread(task).apply {
+      isDaemon = true
+    }
+  }
 
   override fun submit(task: () -> Unit) {
     pool.submit(task)

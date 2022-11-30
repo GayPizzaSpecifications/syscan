@@ -1,8 +1,8 @@
 package lgbt.mystic.syscan.analysis.requirements
 
 import lgbt.mystic.syscan.PlatformPath
+import lgbt.mystic.syscan.PlatformPathSeparator
 import lgbt.mystic.syscan.io.isExecutable
-import java.io.File
 
 class ExecutableRequirement(val name: String) : AnalysisRequirement {
   override fun satisfied(): Boolean {
@@ -13,7 +13,7 @@ class ExecutableRequirement(val name: String) : AnalysisRequirement {
     }
 
     val pathEnvValue = System.getenv("PATH") ?: return false
-    val paths = pathEnvValue.split(File.pathSeparatorChar).map { PlatformPath(it) }
+    val paths = pathEnvValue.split(PlatformPathSeparator()).map { PlatformPath(it) }
     for (path in paths) {
       val pathsToCheck = names.map { name -> path.resolve(name) }
       for (pathToCheck in pathsToCheck) {
